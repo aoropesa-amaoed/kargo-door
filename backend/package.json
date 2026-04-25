@@ -1,0 +1,29 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/formbody": "^8.0.2",
+    "@fastify/jwt": "^10.0.0",
+    "@fastify/postgres": "^6.0.2",
+    "axios": "^1.14.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.3.1",
+    "fastify": "^5.8.4",
+    "nodemailer": "^8.0.5",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

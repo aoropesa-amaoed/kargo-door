@@ -1,0 +1,3 @@
+export const FEATURE_FLAG_DEFAULT_VALUES = {
+  HIDDEN: 'HIDDEN',
+}

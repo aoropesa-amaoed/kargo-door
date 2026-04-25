@@ -1,0 +1,21 @@
+@font-face {
+  font-family: 'Gotham Medium';
+  src: url('../assets/fonts/Gotham Medium.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+html,
+body,
+#app,
+.v-application {
+  font-family: 'Gotham Medium', sans-serif !important;
+}
+
+*,
+*::before,
+*::after {
+  font-family: inherit;
+}
+
