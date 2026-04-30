@@ -1,27 +1,35 @@
 export async function getBookings(db) {
     const selectQuery = `
-        SELECT id, 
-            uuid,
-            organization_id, 
-            insurer_id, 
-            commodity_id, 
-            shipment_type, 
-            shipment_value, 
-            insurer_value, 
-            markup, currency, 
-            tracking_no, 
-            lc_no, eta, 
-            etd, 
-            courier, 
-            transhipment_from,
-            transhipment_to, 
-            origin_address, 
-            destination_address, 
-            customer_id, 
-            status  
-        FROM bookings
-       
-        ORDER BY created_at DESC
+        SELECT a.id, 
+            a.uuid,
+            a.organization_id,             
+            a.insurer_id, 
+            a.commodity_id,
+            b.name as commodity_name,  
+            a.description,          
+            a.shipment_type, 
+            CONCAT(a.currency, ' ', TO_CHAR(a.shipment_value, 'FM999,999,999,999,990.00')) AS "shipment amount", 
+            CONCAT(a.currency, ' ', TO_CHAR(a.insurer_value, 'FM999,999,999,999,990.00')) AS "insured amount", 
+            a.markup, 
+            a.tracking_no, 
+            a.lc_no, 
+            TO_CHAR(a.eta::date, 'YYYY-MM-DD') AS arrival, 
+            TO_CHAR(a.etd::date, 'YYYY-MM-DD') AS departure, 
+            a.courier, 
+            a.transhipment_from,
+            a.transhipment_to, 
+            a.origin_address, 
+            a.destination_address, 
+            a.customer_id, 
+            c.name as customer_name,
+            a.status
+            
+        FROM bookings a
+        INNER JOIN commodity_groups b
+        ON a.commodity_id = b.id
+        INNER JOIN customers c
+        ON a.customer_id = c.id
+        ORDER BY a.created_at DESC
         `;
     const result = await db.query(selectQuery);
     return result.rows;
@@ -33,6 +41,7 @@ export async function getBookingById(db, id) {
             organization_id,
             insurer_id,
             commodity_id,
+            description,
             shipment_type,
             shipment_value,
             insurer_value,
@@ -54,7 +63,9 @@ export async function getBookingById(db, id) {
             destination_country,
             destination_address,
             customer_id,
-            status
+            customer_name,
+            status,
+            description
         FROM bookings
         WHERE id = $1
         LIMIT 1
@@ -89,8 +100,10 @@ export async function createBooking(db, booking) {
                     destination_country,
                     destination_address,
                     customer_id, 
-                    status
-                    )
+                    customer_name,
+            status,
+            description
+        )
         VALUES (
             $1, $2, $3, $4, $5,
             $6, $7, $8, $9, $10,
@@ -99,7 +112,7 @@ export async function createBooking(db, booking) {
             CONCAT_WS(', ', $16::text, $17::text, $18::text),
             $19::text, $20::text, $21::text,
             CONCAT_WS(', ', $19::text, $20::text, $21::text),
-            $22, $23
+            $22, $23, $24
         )
         RETURNING id
     `;
@@ -129,7 +142,8 @@ export async function createBooking(db, booking) {
                     booking.destination_country,
 
                     booking.customer_id, 
-                    booking.status
+                    booking.status,
+                    booking.description,
                 ];
    try {
     const result = await db.query(insertQuery, values);
@@ -177,8 +191,9 @@ export async function updateBooking(db, id, booking) {
         destination_country = $21::text,
         destination_address = CONCAT_WS(', ', $19::text, $20::text, $21::text),
         customer_id = $22,
-        status = $23
-        WHERE id = $24
+        status = $23,
+        description = $24
+        WHERE id = $25
         RETURNING *
     `;
     const values = [
@@ -205,6 +220,7 @@ export async function updateBooking(db, id, booking) {
                     booking.destination_country, 
                     booking.customer_id, 
                     booking.status, 
+                    booking.description,
                     id
                 ];
     try {

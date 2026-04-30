@@ -16,3 +16,11 @@ export const updateQuotationStatusSchema = {
     required: ['quotation_id', 'status'],
     additionalProperties: false,
 };
+export const activatePolicySchema = {
+    type: 'object',
+    properties: {
+        quotation_id: { type: 'string', format: 'uuid' },
+    },
+    required: ['quotation_id'],
+    additionalProperties: false,
+}

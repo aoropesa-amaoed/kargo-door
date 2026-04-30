@@ -3,7 +3,7 @@ import { createPinia } from 'pinia'
 import vuetify from './plugins/vuetify'
 import App from './layout/App.vue'
 import router from './router'
-import { useAuthStore } from './stores/redkik/authStore'
+import { useAuthStore } from '@/stores/authStore'
 import './styles/fonts.css'
 
 const app = createApp(App)

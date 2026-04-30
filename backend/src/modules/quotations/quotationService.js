@@ -249,3 +249,120 @@ export async function getBookings(db, bookingId ) {
     }
   }
 
+export async function activatePolicy(db, quotationId) {
+  const paymentQuery = `
+    SELECT *
+    FROM payments
+    WHERE quotation_id = $1
+    LIMIT 1
+  `;
+  const paymentResult = await db.query(paymentQuery, [quotationId]);
+  const payment = paymentResult.rows[0] ?? null;
+  if (!payment) {
+    throw new Error('Payment not found for quotation');
+  }
+  if (payment.status !== 'paid') {
+    throw new Error('Payment is not settled');
+  }
+
+  const quotationQuery = `
+    SELECT id, booking_id, quote_prefix
+    FROM quotations
+    WHERE id = $1
+    LIMIT 1
+  `;
+  const quotationResult = await db.query(quotationQuery, [quotationId]);
+  const quotation = quotationResult.rows[0] ?? null;
+  if (!quotation) {
+    throw new Error('Quotation not found');
+  }
+
+  const existingPolicyQuery = `
+    SELECT *
+    FROM policies
+    WHERE quotation_id = $1
+    LIMIT 1
+  `;
+  const existingPolicyResult = await db.query(existingPolicyQuery, [quotationId]);
+  const existingPolicy = existingPolicyResult.rows[0] ?? null;
+
+  if (existingPolicy) {
+    await db.query(
+      `UPDATE quotations SET status = $1 WHERE id = $2`,
+      ['issued', quotationId]
+    );
+    return existingPolicy;
+  }
+
+  const now = new Date();
+  const activatedAt = now.toTimeString().split(' ')[0];
+  const quotePrefix = String(quotation.quote_prefix || '').trim();
+  const quoteMatch = quotePrefix.match(/^(.*)-(\d{2})-(\d{5})$/);
+  if (!quoteMatch) {
+    throw new Error('Invalid quotation prefix format');
+  }
+
+  const quotationPrefix = quoteMatch[1];
+  const quoteYearTwoDigits = quoteMatch[2];
+  const quoteSerial = quoteMatch[3];
+  const quoteYear = Number(`20${quoteYearTwoDigits}`);
+
+  const classCode = await getClassCodeByQuotationPrefix(db, quotationPrefix);
+  if (!classCode || !classCode.certificate_prefix) {
+    throw new Error('Class code certificate prefix not found');
+  }
+
+  const certificateNo = `${classCode.certificate_prefix}-${quoteYearTwoDigits}-${quoteSerial}`;
+
+  const certCounterQuery = `
+    SELECT certificate_number
+    FROM number_sequences
+    WHERE class_code_id = $1
+      AND year = $2
+    LIMIT 1
+  `;
+  const certCounterResult = await db.query(certCounterQuery, [classCode.id, quoteYear]);
+  const currentCertCounter = Number(certCounterResult.rows[0]?.certificate_number || 0);
+  const nextCertCounter = currentCertCounter + 1;
+
+  await db.query(
+    `
+      UPDATE number_sequences
+      SET certificate_number = $1
+      WHERE class_code_id = $2
+        AND year = $3
+    `,
+    [nextCertCounter, classCode.id, quoteYear]
+  );
+
+  const policyNo = `${certificateNo}-${String(nextCertCounter).padStart(4, '0')}`;
+
+  const insertPolicyQuery = `
+    INSERT INTO policies (
+      booking_id,
+      quotation_id,
+      policy_no,
+      certificate_no,
+      activated_at
+    )
+    VALUES ($1, $2, $3, $4, $5)
+    RETURNING *
+  `;
+  const policyValues = [
+    quotation.booking_id,
+    quotation.id,
+    policyNo,
+    certificateNo,
+    activatedAt
+  ];
+  const policyResult = await db.query(insertPolicyQuery, policyValues);
+  const policy = policyResult.rows[0] ?? null;
+
+  await db.query(
+    `UPDATE quotations SET status = $1 WHERE id = $2`,
+    ['issued', quotationId]
+  );
+
+  return policy;
+}
+

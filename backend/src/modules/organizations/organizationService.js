@@ -1,9 +1,9 @@
 export async function getOrganizations(db) {
-    const result = await db.query('SELECT name, markup, city, region, country, tin, zipcode FROM organizations');
+    const result = await db.query('SELECT id, name, markup, city, region, country, tin, zipcode FROM organizations');
     return result.rows;
 }
 export async function getOrganizationById(db, id) {
-    const result = await db.query('SELECT name, markup, city, region, country, tin, zipcode FROM organizations WHERE id = $1', [id]);
+    const result = await db.query('SELECT id,   name, markup, city, region, country, tin, zipcode FROM organizations WHERE id = $1', [id]);
     return result.rows[0];
 }
 export async function createOrganization(db, organization) {

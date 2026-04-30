@@ -23,29 +23,41 @@
       <!-- Divider -->
       <v-col v-if="tabItems.length" cols="auto">
         <v-divider 
-          class="mx-6" 
           vertical
+          class="mx-6 top-nav-divider"
         />
       </v-col>
       
-      <!-- Secondary tabs (e.g. New Quotation) -->
+      <!-- Secondary tabs (e.g. New Shipment) -->
       <v-col cols="auto">
-        <div
-          v-if="tabItems.length"
-          class="quotation-tabs d-flex align-center flex-wrap"
-        >
-          <v-chip
-            v-for="(item, index) in tabItems"
-            :key="item.id"
-            class="ma-1 text-none"
-            :variant="index === activeTabIndex ? 'flat' : 'outlined'"
-            :color="index === activeTabIndex ? 'primary' : undefined"
-            :closable="item.hasCloseIcon"
-            @click="activeTabIndex = index"
-            @click:close.stop="closeSubTab(index)"
+        <div>
+          <v-tabs
+            v-if="tabItems.length"
+            :model-value="activeTabIndex"
+            density="compact"
+            hide-slider
+            class="secondary-tabs"
+            @update:model-value="handleActiveTabChange"
           >
-            {{ item.label }}
-          </v-chip>
+            <v-tab
+              v-for="(tab, index) in tabItems"
+              :key="tab.id"
+              :value="index"
+              class="text-none subtab-pill"
+            >
+              <span class="me-2">{{ tab.label }}</span>
+              <v-btn
+                v-if="tab.hasCloseIcon"
+                icon
+                size="x-small"
+                variant="text"
+                class="subtab-close-btn"
+                @click.stop="closeSubTab(tab)"
+              >
+                <v-icon icon="mdi-close" size="16" />
+              </v-btn>
+            </v-tab>
+          </v-tabs>
         </div>
       </v-col>
     </v-row>
@@ -54,12 +66,13 @@
 
 <script setup>
 import { computed, watch, ref } from 'vue';
-import { useRoute } from 'vue-router';
-import { useAuth } from '@/composables/redkik/useAuth';
+import { useRoute, useRouter } from 'vue-router';
+import { useAuth } from '@/composables/useAuth';
 import { useDrawerStore } from '@/stores/drawerStore';
 import { useTabStore } from '@/stores/tabStore.js';
 
 const route = useRoute();
+const router = useRouter();
 const { isAuthenticated } = useAuth();
 const drawerStore = useDrawerStore();
 const tabStore = useTabStore();
@@ -69,12 +82,20 @@ const tabStore = useTabStore();
  * @returns {string} Page title with first letter capitalized
  */
 const currentPageTitle = computed(() => {
-  if (route.path === '/quotations') {
-    return 'Quotation';
+  const path = route.path;
+  
+  // Get base page title from route
+  let baseTitle = '';
+  if (path === '/shipments' || path === '/shipments/new') {
+    baseTitle = 'Shipments';
+  } else if (path === '/quotations' || path === '/quotations/new') {
+    baseTitle = 'Quotations';
+  } else {
+    const title = route.meta?.title || route.name?.toString() || '';
+    baseTitle = title ? title.charAt(0).toUpperCase() + title.slice(1) : '';
   }
-
-  const title = route.meta?.title || route.name?.toString() || 'Page';
-  return title.charAt(0).toUpperCase() + title.slice(1);
+  
+  return baseTitle;
 });
 
 /**
@@ -99,7 +120,12 @@ const iconMap = {
 };
 
 const currentIcon = computed(() => {
-  if (route.path === '/quotations' && tabStore.isAddQuotationTab) {
+  const path = route.path;
+  // Use route path directly to avoid circular dependency
+  if (path === '/quotations/new') {
+    return 'mdi-file-document-edit-outline';
+  }
+  if (path === '/shipments/new' || (path === '/shipments' && tabStore.activeTab === 'add')) {
     return 'mdi-file-document-edit-outline';
   }
   const name = route.name?.toString();
@@ -117,12 +143,24 @@ const tabItems = ref([]);
  * Watch store state and update tabItems ref accordingly
  */
 watch(
-  [() => route.path, () => tabStore.isAddQuotationTab],
+  [() => route.path, () => tabStore.isAddQuotationTab, () => tabStore.tabs.length, () => tabStore.activeTab],
   ([currentPath, isNewQuotationTab]) => {
+    const isNewShipmentTab = tabStore.tabs.some(t => t.name === 'add');
+    
     if (currentPath === '/quotations') {
       if (isNewQuotationTab) {
         tabItems.value = [
           { id: 'add-quotation', label: 'New Quotation', hasCloseIcon: true },
+        ];
+      } else {
+        tabItems.value = [];
+      }
+      return;
+    }
+    if (currentPath === '/shipments') {
+      if (isNewShipmentTab) {
+        tabItems.value = [
+          { id: 'add-shipment', label: 'Add Shipment', hasCloseIcon: true },
         ];
       } else {
         tabItems.value = [];
@@ -135,37 +173,56 @@ watch(
 );
 
 /**
- * Computed property for active tab index (synced with tabStore.activeTab)
+ * Active tab index - derived from route path (avoids circular dependency)
  */
-const activeTabIndex = computed({
-  get: () => {
-    const index = tabItems.value.findIndex(
-      (tab) => tab.id === tabStore.activeTab
-    );
-    return index >= 0 ? index : 0;
-  },
-  set: (index) => {
-    const tab = tabItems.value[index];
-    if (!tab) return;
-    tabStore.setActiveTab(tab.id);
-  },
+const activeTabIndex = computed(() => {
+  const path = route.path;
+  if (path === '/quotations/new' || (path === '/shipments' && tabStore.activeTab === 'add')) {
+    return 0;
+  }
+  return 0;
 });
 
 /**
- * When the only tab is closed, reset quotations tab state
+ * When the only tab is closed, reset tab state
  */
 watch(
   () => tabItems.value.length,
   (newLength, oldLength) => {
     if (oldLength !== 1 || newLength !== 0) return;
-    if (route.path === '/quotations') {
-      tabStore.resetToDefaultQuotationsTab();
+    // if (route.path === '/quotations') {
+    //   tabStore.resetToDefaultQuotationsTab();
+    // }
+    if (route.path === '/shipments') {
+      tabStore.closeShipmentTab();
+      router.push('/shipments');
     }
   }
 );
 
-function closeSubTab(index) {
-  tabItems.value.splice(index, 1);
+function closeSubTab(payload) {
+  const tab =
+    typeof payload === 'number'
+      ? tabItems.value[payload]
+      : payload;
+
+  if (tab?.id === 'add-quotation' || route.path === '/quotations/new') {
+    tabStore.closeQuotationTab();
+    router.push('/quotations');
+  } else if (tab?.id === 'add-shipment' || route.path === '/shipments') {
+    tabStore.closeShipmentTab();
+    router.push('/shipments');
+  }
+}
+
+function handleActiveTabChange(index) {
+  const tab = tabItems.value[index];
+  if (tab?.id === 'add-shipment') {
+    tabStore.setActiveTab('add');
+    if (route.path !== '/shipments') {
+      router.push('/shipments');
+    }
+  }
 }
 </script>
 
@@ -223,5 +280,55 @@ function closeSubTab(index) {
   font-weight: 400;
   color: rgba(0, 0, 0, 0.87);
   line-height: 26px;
+}
+
+:deep(.secondary-tabs) {
+  background: transparent;
+  box-shadow: none;
+}
+
+:deep(.secondary-tabs .v-slide-group__content) {
+  gap: 8px;
+}
+
+:deep(.secondary-tabs::before),
+:deep(.secondary-tabs::after),
+:deep(.secondary-tabs .v-slide-group::before),
+:deep(.secondary-tabs .v-slide-group::after) {
+  display: none !important;
+}
+
+:deep(.secondary-tabs .subtab-pill) {
+  min-width: unset;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 700;
+  font-size: 1.55rem;
+  color: #111111;
+  background-color: #efe7ad;
+  border-radius: 6px 6px 0 0;
+  border-bottom: 4px solid #111111;
+  padding: 8px 16px;
+}
+
+:deep(.secondary-tabs .subtab-pill .v-tab__slider) {
+  display: none;
+}
+
+:deep(.secondary-tabs .subtab-pill .v-btn__content) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+:deep(.secondary-tabs .subtab-close-btn) {
+  color: #1a1a1a;
+  opacity: 0.9;
+}
+
+.top-nav-divider {
+  height: 48px;
+  border-color: rgba(0, 0, 0, 0.28);
+  opacity: 1;
 }
 </style>

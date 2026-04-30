@@ -1,6 +1,7 @@
 <script setup>  
 import { ref, computed, watch } from 'vue';
 import {useTableStore} from '@/stores/tableStore';
+
 const selectedItem = defineModel({
   default: false,
 });
@@ -27,6 +28,7 @@ const {
     disabled,
     totalVisibleSkipPages,
     buttonColumns,
+    
 } = defineProps({
   headers: {
       type: Array,

@@ -77,15 +77,12 @@
   <script setup>
   import { computed } from 'vue';
   import { useRouter } from 'vue-router';
-  import { useAuth } from '@/composables/redkik/useAuth';
+  import { useAuth } from '@/composables/useAuth';
   import logoImage from '@/assets/image/maagap_logo_emarine.png';
 
   const router = useRouter();
-  const { user, isAuthenticated, logout } = useAuth();
-  const logger = {
-    warn: (...args) => console.warn(...args),
-    error: (...args) => console.error(...args),
-  };
+  const { token, user, isAuthenticated, logout } = useAuth();
+  
   
   /**
    * Notification count - currently a placeholder
@@ -111,10 +108,10 @@
         // For now, we'll handle gracefully if route doesn't exist
         try {
           router.push({ name: 'Profile' }).catch(() => {
-            logger.warn('Profile route not available');
+            console.warn('Profile route not available');
           });
         } catch (error) {
-          logger.error('Error navigating to profile:', error);
+          console.error('Error navigating to profile:', error);
         }
       },
     },
@@ -122,30 +119,25 @@
       title: 'Logout',
       icon: 'mdi-logout',
       action: () => {
-        logout();
+        try {
+          logout();
+        } catch (error) {
+          console.error('Error logging out:', error);
+        }
       },
     },
   ]);
-  
-  /**
-   * Handles menu item click with error handling
-   * @param {Object} item - Menu item object
-   */
+
   const handleMenuItemClick = (item) => {
     if (item.action) {
       try {
         item.action();
       } catch (error) {
-        logger.error('Error executing menu item action:', error);
+        console.error('Error executing menu item action:', error);
       }
     }
   };
-  
-  /**
-   * Gets user initial from authenticated user
-   * Falls back to '?' if user data is not available
-   * @returns {string} Single uppercase letter representing user initial
-   */
+ 
   const userInitial = computed(() => {
     if (!user.value) return '?';
     
@@ -160,7 +152,7 @@
   });
   </script>
   
-  <style scoped>
+  <style lang="scss" scoped>
   
   
   .app-bar {
@@ -302,19 +294,7 @@
     transform: rotate(180deg);
   }
   
-  /* Menu Item Styling */
-  /* :deep(.v-list-item--disabled) {
-    opacity: 0.7;
-    cursor: default;
-  }
-  
-  :deep(.v-list-item--disabled .v-icon) {
-    opacity: 0.7;
-  }
-  
-  :deep(.v-list-item--disabled .v-list-item-title) {
-    opacity: 0.7;
-  } */
+ 
   .v-overlay__content.user-menu-overlay,
   .v-overlay__content.user-menu-overlay .v-list,
   .v-overlay__content.user-menu-overlay .v-sheet {

@@ -41,18 +41,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getPolicies } from '@/services/redkik/api';
 
-const policies = ref([]);
 
-onMounted(async () => {
-    try {
-      policies.value = await getPolicies();
-    } catch (error) {
-      console.error('Failed to load quote setup policies:', error);
-      policies.value = [];
-    }
-});
 
 </script>
 

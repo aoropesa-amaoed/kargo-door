@@ -40,7 +40,45 @@ export async function loginUser({ db, jwt, email, password }) {
     user: { id: user.id, email: user.email, name: displayName },
   };
 
+
 }
 
+export async function logoutUser({
+  db,
+  userId,
+  ip,
+  userAgent
+}) {
+
+  await db.query(
+    `
+    INSERT INTO audit_logs
+    (
+      user_id,
+      action,
+      entity,
+      entity_id,
+      metadata,
+      ip_address,
+      user_agent
+    )
+    VALUES ($1,$2,$3,$4,$5,$6,$7)
+    `,
+    [
+      userId,
+      'LOGOUT',
+      'AUTH',
+      userId.toString(),
+      JSON.stringify({ method: 'manual logout' }),
+      ip,
+      userAgent
+    ]
+  );
+
+  return {
+    success: true,
+    message: 'Logged out successfully'
+  };
+}
 
 

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores/userStore';
+import { useAuthStore } from '@/stores/authStore';
 // Views
 import Dashboard from '@/views/Dashboard.vue'
 import Login from '@/views/auth/Login.vue'
@@ -8,6 +8,8 @@ import AddQuotation from '@/views/quotations/AddQuotation.vue'
 import Certificates from '@/views/certificates/Certificates.vue'
 import Referrals from '@/views/referrals/Referrals.vue'
 import Profile from '@/views/user-profile/Profile.vue'
+import Shipments from '@/views/shipments/Shipments.vue'
+import Policies from '@/views/policies/Policies.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,6 +27,23 @@ const router = createRouter({
       },
     },
     {
+      path: '/shipments',
+      name: 'Shipments',
+      component: Shipments,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: '/shipments/new',
+      name: 'New Shipment',
+      component: Shipments,
+      meta: {
+        requiresAuth: true,
+      },
+    },
+  
+    {
       path: '/quotations',
       name: 'Quotations',
       component: Quotations,
@@ -36,6 +55,14 @@ const router = createRouter({
       path: '/quotations/new',
       name: 'New Quote',
       component: AddQuotation,
+    },
+    {
+      path: '/policies',
+      name: 'Policies',
+      component: Policies,
+      meta:{
+        requiresAuth:true,
+      },
     },
     {
       path: '/certificates',
@@ -75,8 +102,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  const userStore = useUserStore();
-  const isAuthenticated = userStore.isAuthenticated();
+  const userStore = useAuthStore();
+  const isAuthenticated = userStore.isAuthenticated;
   const requiresAuth = to.meta.requiresAuth !== false;
   if (requiresAuth && !isAuthenticated) return { name: 'login' };
   if (to.name === 'login' && isAuthenticated) return { name: 'dashboard' };

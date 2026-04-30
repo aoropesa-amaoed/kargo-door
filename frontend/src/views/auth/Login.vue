@@ -119,26 +119,14 @@ import { useRouter } from 'vue-router'
 import MaagapLogoWhite from '@/assets/image/maagap-logo-white.png'
 import KargoDoorLogo from '@/assets/image/kargo-door-logo.png'
 import KargoTagLine from '@/assets/image/kargo-tagline.png'
-import { useLoginForm } from '@/composables/redkik/useLogin.js'
-import { useAuth } from '@/composables/redkik/useAuth.js'
+import { useAuth } from '@/composables/useAuth'
+import { useLoginForm } from '@/composables/useLoginForm'
 import DataPrivacy from '@/components/modals/DataPrivacy.vue'
-import { useUserStore } from '@/stores/userStore'
 
 const router = useRouter()
-const { logout } = useAuth()
-const userStore = useUserStore()
+const { authStore, logout } = useAuth()
 
-const {
-  formData,
-  loading,
-  loginError,
-  errors,
-  handleSubmit,
-  showPassword,
-  togglePasswordVisibility,
-  validateEmailField,
-  validatePasswordField,
-} = useLoginForm()
+const { formData, loading, loginError, errors, handleSubmit, showPassword, togglePasswordVisibility, validateEmailField, validatePasswordField } = useLoginForm()
 
 const emailErrors = computed(() => (errors.email ? [errors.email] : []))
 const passwordErrors = computed(() => (errors.password ? [errors.password] : []))
@@ -148,13 +136,13 @@ const isDataPrivacyModalOpen = ref(false)
 const handleLogin = async () => {
   const result = await handleSubmit()
   if (result?.success && result.needsPrivacyModal) {
-    userStore.syncAuthTokenFromStorage()
+    authStore.syncAuthTokenFromStorage()
     isDataPrivacyModalOpen.value = true
   }
 }
 
 const handleDataPrivacyAgree = async () => {
-  userStore.syncAuthTokenFromStorage()
+  authStore.syncAuthTokenFromStorage()
   await router.push({ name: 'dashboard' })
 }
 

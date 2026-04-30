@@ -24,6 +24,38 @@
    <div class="sidebar-menu-container">
     <div class="sidebar-menu-items">
       <v-list>
+        <!-- Dashboard -->
+        <v-list-item
+            to="/dashboard"
+            class="menu-item"
+            :class="{ 'custom-list-item': isActive('/dashboard') }"
+            :active="isActive('/dashboard')"
+            style="position: relative"
+          >
+            <template #prepend>
+              <div v-if="isActive('/dashboard') && !drawerStore.isRail" class="menu-rectangle"></div>
+              <v-icon>mdi-home</v-icon>
+            </template>
+            <template #title>
+              <p class="menu-item-title" v-if="!drawerStore.isRail">Dashboard</p>
+            </template>
+        </v-list-item>
+       <!--Shipments--> 
+       <v-list-item
+            to="/shipments"
+            class="menu-item"
+            :class="{ 'custom-list-item': isActive('/shipments') }"
+            :active="isActive('/shipments')"
+            style="position: relative"
+          >
+            <template #prepend>
+              <div v-if="isActive('/shipments') && !drawerStore.isRail" class="menu-rectangle"></div>
+              <v-icon>mdi-file-outline</v-icon>
+            </template>
+            <template #title>
+              <p class="menu-item-title" v-if="!drawerStore.isRail">Shipments</p>
+            </template>
+        </v-list-item>
        <!-- Quotations -->
         <v-list-item
             to="/quotations"
@@ -43,18 +75,18 @@
         <!-- Certificates -->
          
          <v-list-item
-            to="/certificates"
+            to="/policies"
             class="menu-item"
-            :class="{ 'custom-list-item': isActive('/certificates') }"
-            :active="isActive('/certificates')"
+            :class="{ 'custom-list-item': isActive('/policies') }"
+            :active="isActive('/policies')"
             style="position: relative"
           >
             <template #prepend>
-              <div v-if="isActive('/certificates') && !drawerStore.isRail" class="menu-rectangle"></div>
+              <div v-if="isActive('/policies') && !drawerStore.isRail" class="menu-rectangle"></div>
               <v-icon>mdi-file-document-outline</v-icon>
             </template>
             <template #title>
-              <p class="menu-item-title" v-if="!drawerStore.isRail">Certificates</p>
+              <p class="menu-item-title" v-if="!drawerStore.isRail">Policies</p>
             </template>
           </v-list-item>
           <!-- Referrals -->
@@ -93,7 +125,7 @@ const drawerStore = useDrawerStore()
 const isActive = (path) => route.path === path
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .sidebar {  
   display: flex;
   flex-direction: column;

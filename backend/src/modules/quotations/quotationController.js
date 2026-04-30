@@ -1,4 +1,4 @@
-import { createQuote, getBookings, getCommodities, updateQuotationStatus, } from './quotationService.js';
+import { createQuote, getBookings, getCommodities, updateQuotationStatus,activatePolicy } from './quotationService.js';
 
 export const createQuoteHandler = async (request, reply) => {
     try {
@@ -36,6 +36,18 @@ export const updateQuotationStatusHandler = async (request, reply) => {
         }
         const quotation = await updateQuotationStatus(request.server.db, quotation_id, status);
         return reply.code(200).send({ success: true, message: 'Quotation status updated successfully', data: quotation });
+    } catch (error) {
+        return reply.code(500).send({ success: false, error: error.message });
+    }
+}
+export const activatePolicyHandler = async (request, reply) => {
+    try {
+        const { quotation_id } = request.body || {};
+        if (!quotation_id) {
+            return reply.code(400).send({ success: false, error: 'quotation_id is required' });
+        }
+        const policy = await activatePolicy(request.server.db, quotation_id);
+        return reply.code(200).send({ success: true, message: 'Policy activated successfully', data: policy });
     } catch (error) {
         return reply.code(500).send({ success: false, error: error.message });
     }

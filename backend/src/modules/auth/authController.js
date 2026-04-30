@@ -1,4 +1,4 @@
-import { loginUser } from './authService.js';
+import { loginUser, logoutUser } from './authService.js';
 
 export async function loginHandler(request, reply) {
   try {
@@ -35,4 +35,15 @@ export async function meHandler(request, reply) {
     success: true,
     user: request.user,
   });
+}
+
+export async function logoutHandler(request, reply) {
+  const result = await logoutUser({
+    db: request.server.db,
+    userId: request.user.sub,
+    ip: request.ip,
+    userAgent: request.headers['user-agent']
+  });
+
+  return reply.send(result);
 }

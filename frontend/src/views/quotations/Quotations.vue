@@ -45,29 +45,15 @@
         </v-row>
     </div>
     <div class="table-container">
-        <Table
-            :headers="headers"
-            :items="filteredItems"
-            :loading="loading"
-            :total-items="filteredTotalItems"
-            :items-per-page="itemsPerPage"
-            :on-update-options="handleTableUpdate"
-            :data-select-type="false"
-            :unique-key="'id'"
-            :frozen-column="0"
-            :button-columns="buttonColumns"
-            :set-status-badges="statusBadges"
-            @item-click="handleItemClick"
-            @button-click="handleButtonClick"
-            :multi-sort="false"
-         />
+       
     </div>
     
     </v-container>
 </template>
 <script setup>
+import DataTable from '@/components/common/dataTable.vue';
 import { computed, ref } from 'vue';
-import Table from '@/components/Table.vue';
+
 
 const search = ref('');
 const loading = ref(false);
