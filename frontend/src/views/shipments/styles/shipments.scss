@@ -1,0 +1,47 @@
+.shipments-page {
+    position: relative;
+  }
+  
+  .shipments-page__container {
+    position: relative;
+    min-height: 240px;
+  }
+  
+  .page-loader {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(2px);
+    border-radius: 8px;
+  }
+  
+  /* Match filter drawer width in Filter.vue (305). Table area only shifts to clear the drawer. */
+  .table-container {
+    margin-top: 20px;
+    transition: margin-inline-end 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @media (min-width: 960px) {
+    .table-container--filter-shift {
+      margin-inline-end: 305px;
+    }
+  }
+  
+  @media (max-width: 959px) {
+    .table-container--filter-shift {
+      margin-inline-end: min(305px, calc(100vw - 24px));
+    }
+  }
+  
+  .action-button{    
+      padding: 4px 8px;
+      height: 50px;
+      width: 100%;    
+  }
+  :deep(.tab-row-tight) {
+    --v-col-gap-x: 8px;
+  }

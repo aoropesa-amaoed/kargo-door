@@ -1,11 +1,15 @@
 <template>
   <v-navigation-drawer
-  v-model="drawerStore.isOpen"
-  :rail="drawerStore.isRail"
-  :rail-width="90"
-  permanent
-  width="250"
-  class="sidebar">
+    :model-value="drawerStore.isOpen"
+    location="start"
+    width="250"
+    :rail="showRail"
+    :rail-width="90"
+    :permanent="isDesktop"
+    :temporary="isMobile"
+    class="sidebar"
+    @update:model-value="drawerStore.setOpen"
+  >
 
   <!-- kargo logo toggle off -->
   <div v-if="!drawerStore.isRail" class="kargo-logo-container-toogle-off">
@@ -14,8 +18,8 @@
     <div v-if="drawerStore.isRail" class="kargo-logo-container-toogle-on">
       <img :src="KargoLogo" alt="Kargo Door Logo" class="kargo-logo" />
     </div>
-    <!-- Collapsed button -->
-    <div class="collapse-btn">
+    <!-- Collapsed button (desktop rail only) -->
+    <div v-if="isDesktop" class="collapse-btn">
       <v-btn icon variant="text" size="small" color="white" @click.stop="drawerStore.toggleRail">
         <v-icon>{{ drawerStore.isRail ? 'mdi-chevron-right' : 'mdi-chevron-left' }}</v-icon>
       </v-btn>
@@ -114,15 +118,45 @@
   </v-navigation-drawer>
   </template>
 <script setup>
-import { useRoute } from 'vue-router'
-import { useDrawerStore } from '@/stores/drawerStore'
+import { computed, watch, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+import { useDisplay } from 'vuetify';
+import { useDrawerStore } from '@/stores/drawerStore';
 import KargoLogo from '@/assets/image/sidebar-kargo-door-logo-2.png';
 import KargoLogoOff from '@/assets/image/sidebar-kargo-door.png';
 
-const route = useRoute()
-const drawerStore = useDrawerStore()
+const route = useRoute();
+const drawerStore = useDrawerStore();
+const { mdAndUp } = useDisplay();
 
-const isActive = (path) => route.path === path
+const isDesktop = computed(() => mdAndUp.value);
+const isMobile = computed(() => !mdAndUp.value);
+const showRail = computed(() => drawerStore.isRail && isDesktop.value);
+
+const isActive = (path) => route.path === path;
+
+onMounted(() => {
+  if (isMobile.value) {
+    drawerStore.close();
+  }
+});
+
+watch(isDesktop, (desktop) => {
+  if (desktop) {
+    drawerStore.open();
+  } else {
+    drawerStore.close();
+  }
+});
+
+watch(
+  () => route.path,
+  () => {
+    if (isMobile.value) {
+      drawerStore.close();
+    }
+  }
+);
 </script>
 
 <style lang="scss" scoped>

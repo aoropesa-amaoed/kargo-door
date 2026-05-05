@@ -1,13 +1,21 @@
 <template>
     <v-app-bar class="app-bar" flat>
       <v-container class="d-flex align-center px-6 justify-space-between" fluid>
+        <div class="d-flex align-center">
+          <v-app-bar-nav-icon
+            v-if="showNavToggle"
+            class="me-2"
+            aria-label="Open navigation menu"
+            @click="drawerStore.toggle()"
+          />
         <div class="logo-container d-flex align-center">
           <img 
             :src="logoImage" 
             class="logo_black"
             alt="Logo"          
           />
-        </div>  
+        </div>
+        </div>
         <v-spacer />  
         <!-- Right side controls -->
         <div class="right-controls d-flex align-center">
@@ -77,10 +85,16 @@
   <script setup>
   import { computed } from 'vue';
   import { useRouter } from 'vue-router';
+  import { useDisplay } from 'vuetify';
   import { useAuth } from '@/composables/useAuth';
+  import { useDrawerStore } from '@/stores/drawerStore';
   import logoImage from '@/assets/image/maagap_logo_emarine.png';
 
   const router = useRouter();
+  const { mdAndUp } = useDisplay();
+  const drawerStore = useDrawerStore();
+
+  const showNavToggle = computed(() => !mdAndUp.value);
   const { token, user, isAuthenticated, logout } = useAuth();
   
   

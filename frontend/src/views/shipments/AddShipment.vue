@@ -1,35 +1,29 @@
 <template>
-    <v-container class="mt-16" fluid>
-        <div>
-            <v-row>
-                <!-- Shipment Details -->
-                <v-col cols="12" md="12">
-                    <v-card>
-                        <v-card-title>Shipment Details</v-card-title>
-                        <v-divider class="mb-2"></v-divider>
-                        
-                        
-                    </v-card>
-
-
-                </v-col>
-                <!-- Voyage Details -->
-                <v-col cols="12" md="12">
-
-                </v-col>
-            </v-row>    
-        </div>
-   
-    </v-container>
+    <v-container  class="mt-2 ml-2 pa-2" fluid> 
+         <!--progress steps  -->
+         <ProgressSteps />
+         <!--title and action buttons -->
+        <TitleandButtons />
+        <!-- Shipment Details -->
+         <!-- step 1 -->
+         <ShipmentForm />
+         <!-- step 2 -->
+         <ClientDetails />
+         <!-- step 3 -->
+        <!-- Shipment Summary -->
+     
+   </v-container>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
 
-
-
+//components
+import TitleandButtons from './components/TitleandButtons.vue';
+import ProgressSteps from './components/ProgressSteps.vue';
+import ShipmentForm from './components/ShipmentForm.vue';
+import ClientDetails from './components/ClientDetails.vue';
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 
 </style>

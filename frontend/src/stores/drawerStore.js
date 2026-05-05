@@ -17,6 +17,10 @@ export const useDrawerStore = defineStore('drawer', () => {
     isOpen.value = false;
   }
 
+  function setOpen(value) {
+    isOpen.value = Boolean(value);
+  }
+
   function toggleRail() {
     isRail.value = !isRail.value;
   }
@@ -31,6 +35,7 @@ export const useDrawerStore = defineStore('drawer', () => {
     toggle,
     open,
     close,
+    setOpen,
     toggleRail,
     setRail,
   };

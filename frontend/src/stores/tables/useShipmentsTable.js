@@ -16,7 +16,7 @@ export const useShipmentsTableStore = defineStore("shipmentsTable", {
             sortBy: "createdAt",
             sortDesc: true,
             filters: {
-                status: null,
+            status: null,
             },
         }),
     },
@@ -41,5 +41,7 @@ export const useShipmentsTableStore = defineStore("shipmentsTable", {
     },
 });
 
-    
+
+
+
 
