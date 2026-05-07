@@ -1,5 +1,5 @@
 export async function getCustomers(db) {
-    const result = await db.query('SELECT  name, email, contact_no, customer_address, zip_code, tax_identification_no FROM customers');
+    const result = await db.query('SELECT  id,name, email, contact_no, customer_address, zip_code, tax_identification_no FROM customers');
     return result.rows;
 }
 export async function createCustomer(db, customer) {

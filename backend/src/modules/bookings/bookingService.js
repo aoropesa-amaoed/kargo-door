@@ -112,7 +112,7 @@ export async function createBooking(db, booking) {
             CONCAT_WS(', ', $16::text, $17::text, $18::text),
             $19::text, $20::text, $21::text,
             CONCAT_WS(', ', $19::text, $20::text, $21::text),
-            $22, $23, $24
+            $22, $23, $24, $25
         )
         RETURNING id
     `;
@@ -142,6 +142,7 @@ export async function createBooking(db, booking) {
                     booking.destination_country,
 
                     booking.customer_id, 
+                    booking.customer_name,
                     booking.status,
                     booking.description,
                 ];

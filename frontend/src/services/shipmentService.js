@@ -9,6 +9,18 @@ export async function fetchShipments() {
         throw error;
     }
 }
+
+export async function fetchCustomers() {
+    try {
+        const { data: payload } = await api.get("/customers");
+        const rows = payload?.data ?? payload ?? [];
+        return Array.isArray(rows) ? rows : [];
+    } catch (error) {
+        console.error("Error fetching customers:", error);
+        throw error;
+    }
+}
+
 export async function fetchCommodities() {
     try {
         const { data: payload } = await api.get("/commodities");
