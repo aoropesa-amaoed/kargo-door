@@ -59,7 +59,8 @@
     />
     <ShipmentsFilter
       v-model="filterPanelOpen"
-      v-model:filter-criteria="tableFilters"
+      :filter-criteria="tableFilters"
+      @update:filter-criteria="(value) => (tableFilters = value)"
       :etd-options="etdOptions"
       :shipment-value-options="shipmentValueOptions"
       :shipment-type-options="shipmentTypeOptions"
@@ -88,13 +89,13 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useTabStore } from '@/stores/tabStore.js';
-import { useShipmentsTableStore } from '@/stores/tables/useShipmentsTable.js';
+import { useShipmentsTableStore } from '@/views/shipments/store/shipmentStore.js';
 //action button 
 import AddShipment from './AddShipment.vue';
 import DataTable from '@/components/common/dataTable.vue';
 import SearchBar from '@/components/common/SearchBar.vue';
 //constants
-import { headers as shipmentHeaders } from './constants/header.js';
+import { headers as shipmentHeaders } from '../constants/header.js';
 //modal
 import ExportParameter from '@/components/modals/ExportParameter.vue';
 import ShipmentsFilter from '@/components/common/Filter.vue';
@@ -252,5 +253,5 @@ const headers = ref(shipmentHeaders);
 
 
 <style lang="scss" scoped>
-  @use './styles/shipments.scss' as shipments;
+  @use '../styles/shipments.scss' as shipments;
 </style>

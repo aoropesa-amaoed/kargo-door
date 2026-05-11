@@ -64,7 +64,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { useShipmentsTableStore } from '@/stores/tables/useShipmentsTable';
+import { useShipmentsTableStore } from '@/views/shipments/store/shipmentStore';
 
 const props = defineProps({
     modelValue: {

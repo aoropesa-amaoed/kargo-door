@@ -1,26 +1,28 @@
 <template>
     <div class="page-header mb-2">
-      <h1 class="page-title">Add Shipment</h1>
-      <div class="action-buttons">
+      <h1 class="page-title">New Shipment</h1>
+      <div class="d-flex ga-4">
         <v-btn
           v-if="showBackButton"
           text="Back"
           prepend-icon="mdi-arrow-left"
-          color="tertiary"
+          color="secondary"
           variant="tonal"
-          class="mb-2 mb-sm-0"
+          class="mb-2 mb-sm-0 branding-button"
           @click="$emit('back')"
         />      
         <template v-if="showLastStepButtons">
           <v-btn
             text="Save"
             class="mb-2 mb-sm-0 branding-button"
+            color="primary"
             :loading="loading"
             :disabled="loading"
             @click="$emit('save')"
           />
           <v-btn
-            text="Purchase on Invoice"         
+            text="Purchase on Invoice"  
+            color="primary"       
             class="mb-2 mb-sm-0 branding-button"
             :disabled="loading"
             @click="$emit('purchaseOnInvoice')"
@@ -30,9 +32,8 @@
         <v-btn
           v-if="showNextButton"
           text="Next"
-          append-icon="mdi-arrow-right"
-          
-          
+          append-icon="mdi-arrow-right"          
+          color="primary"
           class="mb-2 mb-sm-0 branding-button"
           :loading="loading && currentStep === 2"
           :disabled="loading"
@@ -43,8 +44,7 @@
   </template>
   
   <script setup>
-  import { computed } from 'vue';
- 
+  import { computed } from 'vue'; 
   
   const props = defineProps({
     currentStep: { type: Number, required: true },
@@ -59,9 +59,7 @@
   const showLastStepButtons = computed(() => props.currentStep === props.stepsLength);
   </script>
   
-  <style scoped lang="scss">
-  
-  
+  <style scoped lang="scss"> 
   .page-header {
     display: flex;
     justify-content: space-between;
@@ -84,15 +82,9 @@
         display: none;
       }
     }
-  }
-  .action-buttons {
-    display: flex;
-    gap: 12px;
-  }
-  
+  }  
   :deep(.branding-button:hover:not(:disabled)) {
     background-color: primary !important;
-  }
-  
+  } 
   </style>
   

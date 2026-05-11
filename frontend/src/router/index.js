@@ -8,7 +8,7 @@ import AddQuotation from '@/views/quotations/AddQuotation.vue'
 import Certificates from '@/views/certificates/Certificates.vue'
 import Referrals from '@/views/referrals/Referrals.vue'
 import Profile from '@/views/user-profile/Profile.vue'
-import Shipments from '@/views/shipments/Shipments.vue'
+import Shipments from '@/views/shipments/pages/Shipments.vue';
 import Policies from '@/views/policies/Policies.vue';
 
 const router = createRouter({

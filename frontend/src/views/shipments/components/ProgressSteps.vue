@@ -1,5 +1,5 @@
 <template>
-    <div v-if="props.steps && props.steps.length" class="progress-steps mb-2" :class="{ 'shake': isShaking }">
+    <div v-if="props.steps && props.steps.length" class="progress-steps" :class="{ 'shake': isShaking }">
       <div class="steps-container">
         <div 
           v-for="(step, index) in props.steps" 
@@ -96,7 +96,7 @@
     align-items: flex-start;
     position: relative;
     z-index: 2;
-    top: -48px;
+    top: 0;
   }
   
   .step-item {
@@ -138,56 +138,56 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: neutral-grey-light-3;
-    border: 2px solid neutral-grey-light-3;
+    background-color: #e0e0e0;
+    border: 2px solid #e0e0e0;
     transition: all 0.3s ease;
     flex-shrink: 0;
     position: relative;
     z-index: 2;
     
     .step-item.active & {
-      background-color: neutral-grey-light-3;
-      border-color: info-blue-dark;
+      background-color: #e0e0e0;
+      border-color: #1976d2;
     }
     
     .step-item.completed & {
-      background-color: info-blue-dark;
-      border-color: info-blue-dark;
+      background-color: #1976d2;
+      border-color: #1976d2;
     }
   }
   
   .step-number {
     font-weight: 600;
     font-size: 0.9rem;
-    color: text-primary;
+    color: #333;
     
     .step-item.active & {
-      color: text-primary;
+      color: #333;
     }
   }
   
   .step-check {
     font-weight: 700;
     font-size: 1.2rem;
-    color: neutral-white;
+    color: #fff;
     line-height: 1;
   }
   
   .step-title {
     font-size: 0.75rem;
     font-weight: 500;
-    color: text-secondary;
+    color: #666;
     text-align: left;
     line-height: 1.2;
     flex: 1;
     
     .step-item.active & {
-      color: text-primary;
+      color: #333;
       font-weight: 600;
     }
     
     .step-item.completed & {
-      color: text-primary;
+      color: #333;
     }
   }
   
@@ -197,7 +197,7 @@
     transform: translateY(-50%);
     left: 100px;
     right:35px;
-    display: none;
+    display: flex;
     justify-content: space-between;
     align-items: center;
     z-index: 1;
@@ -218,11 +218,11 @@
     height: 3px;
     margin-left: 20%;
     margin-right: 10%;
-    background-color: neutral-grey-light-3;
+    background-color: #e0e0e0;
     transition: background-color 0.3s ease;
     
     .progress-segment.completed & {
-      background-color: info-blue-dark;
+      background-color: #1976d2;
     }
   }
   
@@ -338,7 +338,7 @@
     .progress-segments {
     display: flex;
     position: absolute;
-      top: -15px;
+      top: 32px;
       transform: translateY(-50%);
     left: 0;
     right: 0;

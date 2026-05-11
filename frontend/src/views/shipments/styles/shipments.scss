@@ -1,12 +1,11 @@
+//Shipments page styles
 .shipments-page {
     position: relative;
-  }
-  
+  }  
   .shipments-page__container {
     position: relative;
     min-height: 240px;
-  }
-  
+  }  
   .page-loader {
     position: absolute;
     inset: 0;
@@ -18,8 +17,7 @@
     backdrop-filter: blur(2px);
     border-radius: 8px;
   }
-  
-  /* Match filter drawer width in Filter.vue (305). Table area only shifts to clear the drawer. */
+    /* Match filter drawer width in Filter.vue (305). Table area only shifts to clear the drawer. */
   .table-container {
     margin-top: 20px;
     transition: margin-inline-end 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -45,4 +43,11 @@
   :deep(.tab-row-tight) {
     --v-col-gap-x: 8px;
   }
- 
+  //Add Shipments styles here. 
+  .required-fields{
+    color: red;
+}
+ .shipment-form{
+    padding-left: 2px;
+    padding-right:2px;    
+}

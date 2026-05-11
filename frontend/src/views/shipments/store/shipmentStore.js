@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import { fetchShipments } from "@/services/shipmentService";
+import { fetchShipments } from "@/views/shipments/service/shipmentService";
+
 
 export const useShipmentsTableStore = defineStore("shipmentsTable", {
     state: () => ({
@@ -7,9 +8,8 @@ export const useShipmentsTableStore = defineStore("shipmentsTable", {
         total: 0,
         loading: false,
         error: null,
-    }),
-    getters: {
-        query: () => ({
+
+         query: () => ({
             page: 1,
             pageSize: 10,
             search: "",
@@ -17,9 +17,11 @@ export const useShipmentsTableStore = defineStore("shipmentsTable", {
             sortDesc: true,
             filters: {
             status: null,
-            },
+
+        },
         }),
-    },
+           
+    }),   
     actions: {
         async fetch() {
             this.loading = true;
@@ -40,6 +42,8 @@ export const useShipmentsTableStore = defineStore("shipmentsTable", {
         },
     },
 });
+
+
 
 
 
