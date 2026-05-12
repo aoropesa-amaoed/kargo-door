@@ -68,11 +68,11 @@
     
 </template>
 <script setup>
-import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useShipmentsForm } from "@/views/shipments/store/shipmentFormStore.js";
+import { useShipmentStore } from '../store/shipment.js';
 
-const formStore = useShipmentsForm();
+
+const formStore = useShipmentStore();
 const { addForm, commodityOptions, shipmentType } = storeToRefs(formStore);
 
 const getCommodityName = (id) => {

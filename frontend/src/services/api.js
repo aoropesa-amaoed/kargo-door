@@ -27,9 +27,18 @@ api.interceptors.request.use(async (config) => {
   return Promise.reject(error);
 });
 
-api.interceptors.response.use(async (response) => {
+api.interceptors.response.use((response) => {
   return response;
-}, (error) => {
+}, async (error) => {
+  if (error.response?.status === 401 && error.config?.url !== '/login') {
+    const authStore = useAuthStore();
+    authStore.clearSession();
+
+    if (window.location.pathname !== '/login') {
+      window.location.assign('/login');
+    }
+  }
+
   return Promise.reject(error);
 });
 

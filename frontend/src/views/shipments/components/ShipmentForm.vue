@@ -6,7 +6,7 @@
     <v-divider class="mb-2" />
     <v-form ref="shipmentFormRef" v-model="shipmentFormValid" class="pa-2">      
           <v-autocomplete
-            v-model="addForm.commodity_id"
+            v-model="formData.commodity_id"
             label="Commodity"
             :items="commodityOptions"
             :loading="commoditiesLoading"
@@ -19,7 +19,7 @@
           />
           <v-text-field
             label="Description"
-            v-model="addForm.description"
+            v-model="formData.description"
             class="shipment-form"
             variant="outlined"
             placeholder="Enter Description"
@@ -29,7 +29,7 @@
             <v-col cols="6">
               <v-text-field
                 label="Shipment Value"
-                v-model="addForm.shipment_value"
+                v-model="formData.shipment_value"
                 class="shipment-form"
                 variant="outlined"
                 placeholder="Enter Shipment Value"
@@ -39,7 +39,7 @@
             <v-col cols="6">
               <v-text-field
                 label="Markup Value"
-                v-model="addForm.markup_value"
+                v-model="formData.markup_value"
                 class="shipment-form"
                 variant="outlined"
                 placeholder="Enter Markup Value"
@@ -51,7 +51,7 @@
             <v-col cols="6">
               <v-text-field
                 label="Insured Value"
-                v-model="addForm.insured_value"
+                v-model="formData.insured_value"
                 class="shipment-form"
                 variant="outlined"
                 placeholder="Enter Insured Value"
@@ -61,7 +61,7 @@
             <v-col cols="6">
               <v-text-field
                 label="Currency"
-                v-model="addForm.currency"
+                v-model="formData.currency"
                 class="shipment-form"
                 variant="outlined"
                 placeholder="Enter Currency"
@@ -71,7 +71,7 @@
           </v-row>
           <v-text-field
             label="Tracking No"
-            v-model="addForm.tracking_no"
+            v-model="formData.tracking_no"
             class="shipment-form"
             variant="outlined"
             placeholder="Enter Tracking No"
@@ -79,7 +79,7 @@
           />
           <v-text-field
             label="LC No"
-            v-model="addForm.lc_no"
+            v-model="formData.lc_no"
             class="shipment-form"
             variant="outlined"
             placeholder="Enter LC No"
@@ -99,7 +99,7 @@
               <v-text-field
                 type="date"
                 label="ETD"
-                v-model="addForm.etd"
+                v-model="formData.etd"
                 class="shipment-form mt-4"
                 variant="outlined"
                 placeholder="Enter ETD"
@@ -110,7 +110,7 @@
               <v-text-field
                 type="date"
                 label="ETA"
-                v-model="addForm.eta"
+                v-model="formData.eta"
                 class="shipment-form mt-4"
                 variant="outlined"
                 placeholder="Enter ETA"
@@ -124,7 +124,7 @@
           </h4>
           <v-text-field
             label="City"
-            v-model="addForm.origin_city"
+            v-model="formData.origin_city"
             class="shipment-form mt-2"
             variant="outlined"
             placeholder="Enter City"
@@ -134,7 +134,7 @@
             <v-col cols="6">
               <v-text-field
                 label="Region"
-                v-model="addForm.origin_region"
+                v-model="formData.origin_region"
                 class="shipment-form"
                 variant="outlined"
                 placeholder="Enter Region"
@@ -144,7 +144,7 @@
             <v-col cols="6">
               <v-text-field
                 label="Country"
-                v-model="addForm.origin_country"
+                v-model="formData.origin_country"
                 class="shipment-form"
                 variant="outlined"
                 placeholder="Enter Country"
@@ -158,7 +158,7 @@
           </h4>
           <v-text-field
             label="City"
-            v-model="addForm.destination_city"
+            v-model="formData.destination_city"
             class="shipment-form mt-2"
             variant="outlined"
             placeholder="Enter City"
@@ -168,7 +168,7 @@
             <v-col cols="6">
               <v-text-field
                 label="Region"
-                v-model="addForm.destination_region"
+                v-model="formData.destination_region"
                 class="shipment-form"
                 variant="outlined"
                 placeholder="Enter Region"
@@ -178,7 +178,7 @@
             <v-col cols="6">
               <v-text-field
                 label="Country"
-                v-model="addForm.destination_country"
+                v-model="formData.destination_country"
                 class="shipment-form"
                 variant="outlined"
                 placeholder="Enter Country"
@@ -189,7 +189,7 @@
           <!-- other details -->
           <v-text-field
             label="Conveyance Type"
-            v-model="addForm.courier"
+            v-model="formData.courier"
             class="shipment-form"
             variant="outlined"
             placeholder="Enter Conveyance Type"
@@ -197,7 +197,7 @@
           />
           <v-text-field
             label="Carrier Name"
-            v-model="addForm.carrier_name"
+            v-model="formData.carrier_name"
             class="shipment-form"
             variant="outlined"
             placeholder="Enter Carrier Name"
@@ -217,18 +217,13 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { useShipmentsForm } from "@/views/shipments/store/shipmentFormStore.js";
 
-const formStore = useShipmentsForm();
-const {
-  addForm,
-  commodityOptions,
-  loading: commoditiesLoading,
-} = storeToRefs(formStore);
+import { useShipmentStore } from "../store/shipment.js";
+
+const formStore = useShipmentStore();
+const { addForm: formData, commodityOptions, commoditiesLoading } = storeToRefs(formStore);
 
 // Form refs and validation
-const shipmentFormRef = ref(null);
-const voyageFormRef = ref(null);
 const shipmentFormValid = ref(false);
 const voyageFormValid = ref(false);
 
@@ -239,8 +234,8 @@ const canAccessStep3 = computed(() => {
   );
 });
 
-onMounted(() => {
-  formStore.fetchCommodityOptions();
+onMounted(async () => {
+  await formStore.fetchCommodityOptions();
 });
 </script>
 <style scoped lang="scss">

@@ -89,7 +89,7 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue';
 import { useTabStore } from '@/stores/tabStore.js';
-import { useShipmentsTableStore } from '@/views/shipments/store/shipmentStore.js';
+import { useShipmentStore } from '@/views/shipments/store/shipment.js';
 //action button 
 import AddShipment from './AddShipment.vue';
 import DataTable from '@/components/common/dataTable.vue';
@@ -101,7 +101,7 @@ import ExportParameter from '@/components/modals/ExportParameter.vue';
 import ShipmentsFilter from '@/components/common/Filter.vue';
 
 const tabStore = useTabStore();
-const shipmentStore = useShipmentsTableStore();
+const shipmentStore = useShipmentStore();
 
 const search = ref('');
 

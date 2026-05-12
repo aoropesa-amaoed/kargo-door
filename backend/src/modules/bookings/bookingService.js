@@ -76,6 +76,7 @@ export async function getBookingById(db, id) {
 export async function createBooking(db, booking) {
    const insertQuery = `
         INSERT INTO bookings (
+                    id,
                     organization_id, 
                     insurer_id, 
                     commodity_id, 
@@ -100,19 +101,19 @@ export async function createBooking(db, booking) {
                     destination_country,
                     destination_address,
                     customer_id, 
-                    customer_name,
             status,
             description
         )
         VALUES (
+            (SELECT COALESCE(MAX(id), 0) + 1 FROM bookings),
             $1, $2, $3, $4, $5,
             $6, $7, $8, $9, $10,
-            $11, $12, $13, $14, $15,           
+            $11, $12, $13, $14, $15,
             $16::text, $17::text, $18::text,
             CONCAT_WS(', ', $16::text, $17::text, $18::text),
             $19::text, $20::text, $21::text,
             CONCAT_WS(', ', $19::text, $20::text, $21::text),
-            $22, $23, $24, $25
+            $22, $23, $24
         )
         RETURNING id
     `;
@@ -142,7 +143,6 @@ export async function createBooking(db, booking) {
                     booking.destination_country,
 
                     booking.customer_id, 
-                    booking.customer_name,
                     booking.status,
                     booking.description,
                 ];

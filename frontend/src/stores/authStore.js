@@ -59,6 +59,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  function clearSession() {
+    token.value = "";
+    user.value = null;
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+  }
+
   function syncAuthTokenFromStorage() {
     token.value = localStorage.getItem(TOKEN_KEY) ?? "";
     user.value = JSON.parse(localStorage.getItem(USER_KEY) ?? null);
@@ -77,6 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
     error,
     login,
     logout,
+    clearSession,
     syncAuthTokenFromStorage,
     initialize,
   }

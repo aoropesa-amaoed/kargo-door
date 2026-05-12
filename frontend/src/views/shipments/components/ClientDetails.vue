@@ -36,7 +36,7 @@
                             </v-radio-group>                                   
 
                             <template v-if="hasSelectedCustomer">
-                                <v-row v-if="isNewCustomer">
+                                <v-row v-if="showIndividualFields">
                                     <v-col cols="6" md="6">
                                         <v-text-field
                                             label="First Name"
@@ -59,7 +59,7 @@
                                     </v-col>                   
                                 </v-row>
                                 <v-text-field
-                                    v-if="isNewCustomer"
+                                    v-if="showBusinessFields"
                                     label="Business Name"
                                     v-model="addForm.business_name"
                                     class="shipment-form"
@@ -130,16 +130,19 @@
 <script setup>
 import { computed, onMounted } from 'vue';
 import { storeToRefs } from 'pinia';
-import { useShipmentsForm } from "@/views/shipments/store/shipmentFormStore.js";
+import { useShipmentStore } from '../store/shipment.js';
+
 
 const NEW_CUSTOMER_ID = "__new__";
-const formStore = useShipmentsForm();
-const { addForm, addFormValid, customerAutocompleteItems, loading: customersLoading } = storeToRefs(formStore);
+const formStore = useShipmentStore();
+const { addForm, addFormValid, customerAutocompleteItems, customersLoading } = storeToRefs(formStore);
 
 
 
 const isNewCustomer = computed(() => addForm.value.customer_id === NEW_CUSTOMER_ID);
 const hasSelectedCustomer = computed(() => !!addForm.value.customer_id);
+const showIndividualFields = computed(() => isNewCustomer.value && addForm.value.customer_type === "Individual");
+const showBusinessFields = computed(() => isNewCustomer.value && addForm.value.customer_type === "Business");
 
 onMounted(() => {
     formStore.fetchCustomerOptions();

@@ -64,7 +64,7 @@
 
 <script setup>
 import { computed, ref } from 'vue';
-import { useShipmentsTableStore } from '@/views/shipments/store/shipmentStore';
+import { useShipmentStore } from '@/views/shipments/store/shipment';
 
 const props = defineProps({
     modelValue: {
@@ -80,12 +80,12 @@ const props = defineProps({
             'payments', 
             'claims', 
             'policies'
-        ].includes(value)
+        ].includes(value)   
     }
 });
 
 const emit = defineEmits(['update:modelValue']);
-const shipmentsStore = useShipmentsTableStore();
+const shipmentsStore = useShipmentStore();
 
 const isOpen = computed({
     get: () => props.modelValue,

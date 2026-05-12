@@ -50,10 +50,13 @@ import ShipmentSummary from '../components/Summary.vue';
 //composables
 import {useProgressSteps} from '../composables/progressSteps';
 //store
-import { useShipmentsForm } from '../store/shipmentFormStore.js';
+import {useShipmentStore} from '../store/shipment.js';
+
+
+
 
 const router = useRouter();
-const formStore = useShipmentsForm();
+const formStore = useShipmentStore();
 
 const { currentStep, steps, gotoNextStep, gotoPreviousStep, gotoStep, isFirstStep, isLastStep, resetSteps } = useProgressSteps();
 
