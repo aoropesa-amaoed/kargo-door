@@ -33,7 +33,6 @@
         <ShipmentSummary 
          v-if="currentStep === 3"
         />
-     
    </v-container>
 </template>
 
@@ -46,7 +45,6 @@ import ProgressSteps from '../components/ProgressSteps.vue';
 import ShipmentForm from '../components/ShipmentForm.vue';
 import ClientDetails from '../components/ClientDetails.vue';
 import ShipmentSummary from '../components/Summary.vue';
-
 //composables
 import {useProgressSteps} from '../composables/progressSteps';
 //store
@@ -94,7 +92,6 @@ const handleSave = async () => {
     console.error('Save failed:', error);
   }
 };
-
 const handlePurchaseOnInvoice = () => {
   // Implement purchase on invoice logic
   console.log('Purchase on invoice');

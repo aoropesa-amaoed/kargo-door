@@ -42,6 +42,14 @@ const router = createRouter({
         requiresAuth: true,
       },
     },
+    {
+      path: '/shipments/:id',
+      name: 'Shipment Details',
+      component: Shipments,
+      meta: {
+        requiresAuth: true,
+      },
+    },
   
     {
       path: '/quotations',

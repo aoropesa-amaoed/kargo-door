@@ -1,6 +1,6 @@
 <template>
   <v-container class="top-nav-bar-container" fluid>
-    <v-row align="center" no-gutters class="h-100">
+    <v-row align="center" no-gutters class="h-100 ">
       <!-- Icon and Title -->
       <v-col cols="auto">
         <div 
@@ -9,7 +9,7 @@
             'page-content-no-user': !isAuthenticated,
             'rail-mode': drawerStore.isRail 
           }"
-        >
+          >
           <v-icon 
             v-if="currentIcon" 
             :icon="currentIcon" 
@@ -98,11 +98,6 @@ const currentPageTitle = computed(() => {
   return baseTitle;
 });
 
-/**
- * Icon mapping for different routes
- * Maps route names to Material Design Icons
- * Falls back to 'mdi-file-document-outline' if route not found
- */
 const iconMap = {
   Quotations: 'mdi-account-multiple-outline',
   Certificates: 'mdi-account-multiple-outline',
@@ -145,8 +140,6 @@ const tabItems = ref([]);
 watch(
   [() => route.path, () => tabStore.isAddQuotationTab, () => tabStore.tabs.length, () => tabStore.activeTab],
   ([currentPath, isNewQuotationTab]) => {
-    const isNewShipmentTab = tabStore.tabs.some(t => t.name === 'add');
-    
     if (currentPath === '/quotations') {
       if (isNewQuotationTab) {
         tabItems.value = [
@@ -157,14 +150,15 @@ watch(
       }
       return;
     }
-    if (currentPath === '/shipments') {
-      if (isNewShipmentTab) {
-        tabItems.value = [
-          { id: 'add-shipment', label: 'Add Shipment', hasCloseIcon: true },
-        ];
-      } else {
-        tabItems.value = [];
-      }
+    if (currentPath.startsWith('/shipments')) {
+      tabItems.value = tabStore.tabs
+        .filter(tab => tab.name !== 'Shipments')
+        .map(tab => ({
+          id: tab.name,
+          label: tab.label,
+          route: tab.route,
+          hasCloseIcon: tab.closable,
+        }));
       return;
     }
     tabItems.value = [];
@@ -180,7 +174,8 @@ const activeTabIndex = computed(() => {
   if (path === '/quotations/new' || (path === '/shipments' && tabStore.activeTab === 'add')) {
     return 0;
   }
-  return 0;
+  const index = tabItems.value.findIndex(tab => tab.id === tabStore.activeTab);
+  return index >= 0 ? index : 0;
 });
 
 /**
@@ -190,9 +185,7 @@ watch(
   () => tabItems.value.length,
   (newLength, oldLength) => {
     if (oldLength !== 1 || newLength !== 0) return;
-    // if (route.path === '/quotations') {
-    //   tabStore.resetToDefaultQuotationsTab();
-    // }
+    
     if (route.path === '/shipments') {
       tabStore.closeShipmentTab();
       router.push('/shipments');
@@ -209,20 +202,21 @@ function closeSubTab(payload) {
   if (tab?.id === 'add-quotation' || route.path === '/quotations/new') {
     tabStore.closeQuotationTab();
     router.push('/quotations');
-  } else if (tab?.id === 'add-shipment' || route.path === '/shipments') {
+  } else if (tab?.id === 'add') {
     tabStore.closeShipmentTab();
+    router.push('/shipments');
+  }
+  else if (tab?.id.startsWith('details-')) {
+    tabStore.closeShipmentDetailsTab(tab.id);
     router.push('/shipments');
   }
 }
 
 function handleActiveTabChange(index) {
   const tab = tabItems.value[index];
-  if (tab?.id === 'add-shipment') {
-    tabStore.setActiveTab('add');
-    if (route.path !== '/shipments') {
-      router.push('/shipments');
-    }
-  }
+  if (!tab) return;
+  tabStore.setActiveTab(tab.id);
+  router.push(tab.route || '/shipments');
 }
 </script>
 
@@ -280,6 +274,7 @@ function handleActiveTabChange(index) {
   font-weight: 400;
   color: rgba(0, 0, 0, 0.87);
   line-height: 26px;
+
 }
 
 :deep(.secondary-tabs) {
@@ -290,7 +285,6 @@ function handleActiveTabChange(index) {
 :deep(.secondary-tabs .v-slide-group__content) {
   gap: 8px;
 }
-
 :deep(.secondary-tabs::before),
 :deep(.secondary-tabs::after),
 :deep(.secondary-tabs .v-slide-group::before),
@@ -309,6 +303,13 @@ function handleActiveTabChange(index) {
   border-radius: 6px 6px 0 0;
   border-bottom: 4px solid #111111;
   padding: 8px 16px;
+
+  //small screen
+   @media (max-width: 600px) {
+    font-size: 1.25rem;
+    padding: 6px 12px;
+  }
+
 }
 
 :deep(.secondary-tabs .subtab-pill .v-tab__slider) {
@@ -330,5 +331,49 @@ function handleActiveTabChange(index) {
   height: 48px;
   border-color: rgba(0, 0, 0, 0.28);
   opacity: 1;
+}
+
+@media (max-width: 599.98px) {
+  .top-nav-bar-container {
+    min-height: 64px;
+    height: auto;
+    padding: 8px 12px;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .top-nav-bar-container :deep(.v-row) {
+    row-gap: 8px;
+  }
+
+  .page-content,
+  .page-content.rail-mode {
+    margin-left: 20px;
+  }
+
+  .page-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .page-title {
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .top-nav-divider {
+    display: block;
+  }
+  :deep(.secondary-tabs) {
+    max-width: calc(100vw - 24px);
+  }
+  :deep(.secondary-tabs .v-slide-group__content) {
+    gap: 6px;
+  }
+  :deep(.secondary-tabs .subtab-pill) {
+    font-size: 1rem;
+    min-height: 36px;
+    padding: 4px 10px;
+  }
 }
 </style>

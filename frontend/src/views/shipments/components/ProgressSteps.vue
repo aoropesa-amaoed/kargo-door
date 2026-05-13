@@ -225,25 +225,21 @@
       background-color: #1976d2;
     }
   }
-  
-  @media (max-width: 600px) {
-  
+    @media (max-width: 600px) 
+    {  
      .steps-container {
       display: flex;
       flex-direction: row;
       gap: 1rem;
-    } 
-    
+    }     
     .progress-steps {
       display: flex;
       flex-direction: column;
       margin-left: 2rem;
-      // align-items: center;
+     
       justify-content: space-between;
       gap: 2rem;
-    }  
-   
-    
+    }      
     .step-item {
       display: flex;
       flex-direction: column;
@@ -270,6 +266,9 @@
       color: text-secondary;
       text-align: left;
       line-height: 1.2;
+      display: none;
+    }
+    .progress-segments {
       display: none;
     }
     

@@ -70,8 +70,7 @@
         :value="i"
         :title="item.title"
         :prepend-icon="item.icon"
-        :disabled="item.disabled"
-        
+        :disabled="item.disabled"        
         @click="handleMenuItemClick(item)"
       />
     </v-list>

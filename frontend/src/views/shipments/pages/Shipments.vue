@@ -74,12 +74,18 @@
       <DataTable
         :headers="headers"
         :items="filteredItems"
+        :loading="shipmentStore.loading"
+        :buttons-column="actionKeys"
+        @button-click="handleTableButtonClick"
       />
     </div>
     </template>
     <!-- main content for new shipment form -->
       <template v-else-if="tabStore.activeTab === 'add'">
         <AddShipment />  
+      </template>
+      <template v-else-if="tabStore.activeTab.startsWith('details')">
+        <ShipmentDetails />
       </template>
     
     </v-container>
@@ -92,6 +98,7 @@ import { useTabStore } from '@/stores/tabStore.js';
 import { useShipmentStore } from '@/views/shipments/store/shipment.js';
 //action button 
 import AddShipment from './AddShipment.vue';
+import ShipmentDetails from './ShipmentDetails.vue';
 import DataTable from '@/components/common/dataTable.vue';
 import SearchBar from '@/components/common/SearchBar.vue';
 //constants
@@ -105,6 +112,44 @@ const shipmentStore = useShipmentStore();
 
 const search = ref('');
 
+
+const actionKeys = [
+  {
+    key: 'action',
+    title: 'Actions',
+     sortable: false,
+     filterable: false,
+     buttons: [
+      {
+      key: 'view',
+      text: 'View',
+      color: 'secondary',      
+      icon: 'mdi-eye-outline',
+      menuitems:[
+        {
+          key: 'viewDetails',
+          text: 'View Details',
+          icon: 'mdi-eye-outline',
+          color: 'secondary',
+          onClick: (item) => {
+           openShipmentDetails(item); 
+           
+           },
+          },
+        
+         {
+          key: 'editShipment',
+          text: 'Edit Shipment',
+          icon: 'mdi-pencil-outline',
+          color: 'primary',
+         },
+      ]
+     }
+      
+     ]
+  }
+];
+
 onMounted(async () => {
   window.addEventListener('resize', onWindowResizeForFilter);
   try {
@@ -117,6 +162,17 @@ onMounted(async () => {
 const openAddShipment = () => {
   tabStore.openAddShipment();
 };
+
+const openShipmentDetails = (shipment) => {
+  tabStore.openShipmentDetails(shipment);
+};
+
+const handleTableButtonClick = ({ action, item }) => {
+  if (action === 'viewDetails') {
+    openShipmentDetails(item);
+  }
+};
+
 const tableFilters = ref({
   etd: null,
   shipmentAmount: null,
