@@ -1,4 +1,4 @@
-import { computed,ref } from "vue";
+import { computed, ref, watch } from "vue";
 import { defineStore } from "pinia";
 import api from "@/services/api";
 import {useAuthStore} from "@/stores/authStore.js";
@@ -43,10 +43,20 @@ function blankToNull(value) {
     return value === "" || value == null ? null : value;
 }
 
-function toNumber(value, fallback = 0) {
+export function toNumber(value, fallback = 0) {
     if (value === "" || value == null) return fallback;
     const parsed = Number(String(value).replace(/,/g, ""));
     return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+/** Display / v-model: e.g. 1234567.89 → "1,234,567.89" */
+export function formatAmountWithCommas(value) {
+    const n = typeof value === "number" ? value : toNumber(value, NaN);
+    if (!Number.isFinite(n)) return "";
+    return new Intl.NumberFormat("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(n);
 }
 
 function isUuid(value) {
@@ -81,7 +91,15 @@ function getApiErrorMessage(err) {
 }
 
 
+function hasMarkupFieldInput(form) {
+    const mv = form.markup_value;
+    if (mv === null || mv === undefined) return false;
+    if (typeof mv === "string" && mv.trim() === "") return false;
+    return true;
+}
+
 export const useShipmentStore = defineStore("shipment", () => {
+    const authStore = useAuthStore();
     const shipments = ref([]);
     const addForm = ref(defaultAddForm());
     const addFormValid = ref(false);
@@ -107,6 +125,60 @@ export const useShipmentStore = defineStore("shipment", () => {
         return "import";
     });
 
+    const markup = computed(() => {
+        return toNumber(addForm.value.markup_value ?? authStore.user?.markup);
+    });
+
+    function computedInsuredFromShipment(sv, pct) {
+        if (sv > 0 && pct >= 0) {
+            const calculated = sv * (1 + pct / 100);
+            return Math.round(calculated * 100) / 100;
+        }
+        return null;
+    }
+
+    const insurerValue = computed(() => {
+        const shipmentValue = toNumber(addForm.value.shipment_value);
+        const pct = markup.value;
+        const fromFormula = computedInsuredFromShipment(shipmentValue, pct);
+        if (fromFormula != null) return fromFormula;
+        return toNumber(addForm.value.insured_value);
+    });
+
+    watch(
+        () => [addForm.value.shipment_value, addForm.value.markup_value, markup.value],
+        () => {
+            const sv = toNumber(addForm.value.shipment_value);
+            const pct = markup.value;
+            const next = computedInsuredFromShipment(sv, pct);
+            if (next != null) {
+                addForm.value.insured_value = formatAmountWithCommas(next);
+            }
+        },
+        { immediate: true }
+    );
+
+    async function hydrateMarkupFromProfile() {
+        if (hasMarkupFieldInput(addForm.value)) return;
+
+        try {
+            const response = await api.get("/user-profiles/me");
+            const profile = response.data?.data;
+            const m = profile?.markup;
+            if (m !== null && m !== undefined && !(typeof m === "string" && m.trim() === "")) {
+                addForm.value.markup_value = m;
+                return;
+            }
+        } catch {
+            /* profile optional for markup fallback */
+        }
+
+        const fallback = authStore.user?.markup;
+        if (fallback !== null && fallback !== undefined && !(typeof fallback === "string" && fallback.trim() === "")) {
+            addForm.value.markup_value = fallback;
+        }
+    }
+   
     async function fetch() {
         loading.value = true;
         error.value = "";
@@ -187,7 +259,6 @@ export const useShipmentStore = defineStore("shipment", () => {
     }
 
     async function buildShipmentPayload(shipmentData) {
-        const authStore = useAuthStore();
         const payload = { ...(shipmentData ?? addForm.value) };
 
         if (payload.customer_id === NEW_CUSTOMER_ID) {
@@ -201,8 +272,8 @@ export const useShipmentStore = defineStore("shipment", () => {
         payload.insurer_id = payload.insurer_id ?? authStore.user?.insurer_id ?? authStore.user?.id;
         payload.shipment_type = payload.shipment_type ?? shipmentType.value;
         payload.shipment_value = toNumber(payload.shipment_value);
-        payload.insurer_value = toNumber(payload.insurer_value ?? payload.insured_value);
-        payload.markup = toNumber(payload.markup ?? payload.markup_value);
+        payload.insurer_value = toNumber(insurerValue.value);
+        payload.markup = toNumber(markup.value);
         payload.currency = payload.currency || "PHP";
         payload.eta = blankToNull(payload.eta);
         payload.etd = blankToNull(payload.etd);
@@ -271,9 +342,10 @@ export const useShipmentStore = defineStore("shipment", () => {
         addForm.value.business_name = "";
     }
 
-    function resetAddForm() {
+    async function resetAddForm() {
         addForm.value = defaultAddForm();
         addFormValid.value = false;
+        await hydrateMarkupFromProfile();
     }
 
     return {
@@ -293,6 +365,7 @@ export const useShipmentStore = defineStore("shipment", () => {
         fetchCommodityOptions,
         fetchCustomerOptions,
         onCustomerSelected,
-        resetAddForm
+        resetAddForm,
+        hydrateMarkupFromProfile,
     };
 });     

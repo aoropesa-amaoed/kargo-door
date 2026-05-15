@@ -2,6 +2,7 @@
 import AppBar from './AppBar.vue';
 import SideBar from './SideBar.vue';
 import Tab from './Tab.vue';
+import Loader from '@/components/common/Loader.vue';
 import { useRouter } from 'vue-router';
 import { computed } from 'vue';
 
@@ -19,6 +20,7 @@ const isLogin = computed(() => router.currentRoute.value.name === 'login');
     <v-main>      
         <router-view />          
     </v-main>
+    <Loader bind-to-store fullscreen />
   </v-app>
 </template>
 

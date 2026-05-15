@@ -14,6 +14,7 @@ import bookingRoutes from './modules/bookings/bookingRoutes.js';
 import quotationRoutes from './modules/quotations/quotationRoutes.js';
 import referralRoutes from './modules/referrals/referralRoutes.js';
 import paymentRoutes from './modules/payments/paymentRoutes.js';
+import profileRoutes from './modules/user-profiles/profileRoutes.js';
 
 function buildApp() {
   const app = Fastify({ logger: true });
@@ -42,6 +43,7 @@ function buildApp() {
   app.register(quotationRoutes);
   app.register(referralRoutes);
   app.register(paymentRoutes);
+  app.register(profileRoutes);
   app.get('/health', async () => {
     return { status: 'OK', message: 'Server is running' };
   });

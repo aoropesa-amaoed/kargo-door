@@ -15,11 +15,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => Boolean(token.value));
   const isAdmin = computed(() => user.value?.role === 'admin');
   
-  // const isUnderwriter = computed(() => user.value?.role === 'underwriter');
-  // const isManager = computed(() => user.value?.role === 'manager');
-  // const isAgent = computed(() => user.value?.role === 'agent');
-
-  async function login(payload) {
+ async function login(payload) {
     isLoading.value = true;
     error.value = null;
     try {

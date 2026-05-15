@@ -83,7 +83,7 @@ const handleSave = async () => {
     await formStore.createShipment();
     // Success - show message and navigate
     alert('Shipment created successfully!');
-    formStore.resetAddForm();
+    await formStore.resetAddForm();
     resetSteps();
     router.push('/shipments');
   } catch (error) {
